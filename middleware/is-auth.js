@@ -1,8 +1,13 @@
 const jwt = require('jsonwebtoken');
 
 module.exports = (req, res, next) => {
+    if(!req.get('Authorization')) {
+        const error = new Error('No authorization token');
+        error.statusCode = 401;
+        throw error;
+    }
+
     const token = req.get('Authorization').split(' ')[1];
-    console.log(req.get('Authorization'))
     let decodedToken;
     try{
         decodedToken = jwt.verify(token, 'somesupersecretsecretsecret');
@@ -17,6 +22,6 @@ module.exports = (req, res, next) => {
         error.statusCode = 401;
         throw error;
     }
-    res.userId = decodedToken.userId;
+    req.userId = decodedToken.userId;
     next();
 }
